@@ -86,19 +86,33 @@ class InsertForm:
 
     def saveNewPath(self, name, path, color):
 
-        #Abrir conexión
-        self.conexion = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+'/panel.db')
-        #Crear cursor (permite ejecutar consultas)
-        self.cursor = self.conexion.cursor()
+        if self.isValidatePath(name, path, color):
+            self.conexion = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+'/panel.db')
+            self.cursor = self.conexion.cursor()
+            self.cursor.execute("INSERT INTO path VALUES(null, '" + name + "', '" + path + "', '" + color + "')")
+            self.conexion.commit()
+            self.conexion.close()
+            self.window.destroy()
 
-        # Insertar datos
-        self.cursor.execute("INSERT INTO path VALUES(null, '" + name + "', '" + path + "', '" + color + "')")
-        self.conexion.commit()
+    def isValidatePath(self, name, path, color) -> bool:
+        if len(name) == 0:
+            MessageBox.showerror("Error", "The name does not empty")
+            return False
+        else:
+            if len(color) == 0:
+                MessageBox.showerror("Error", "The color does not empty")
+                return False
+            else:
+                if len(path) == 0:
+                    MessageBox.showerror("Error", "The path does not empty")
+                    return False
+                else:
+                    if not os.path.exists(path):
+                        MessageBox.showerror("Error", "The path does not exist")
+                        return False
 
+        return True
 
-        self.conexion.close()
-
-        self.window.destroy()
 
     def seleccionar(self, opcion, campo):
         campo.config(state="normal")

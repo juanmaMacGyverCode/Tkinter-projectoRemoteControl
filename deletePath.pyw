@@ -52,19 +52,25 @@ class DeletePath:
 
     def deletePath(self, idPath):
 
-        #Abrir conexión
         self.conexion = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+'/panel.db')
-        #Crear cursor (permite ejecutar consultas)
         self.cursor = self.conexion.cursor()
 
-        # Borrar registros
-        self.cursor.execute("DELETE FROM path WHERE id ='" + idPath + "';")
-        self.conexion.commit()
+        self.cursor.execute("SELECT * FROM path;")
+        paths = self.cursor.fetchall()
 
-        # Insertar datos
-        #self.cursor.execute("INSERT INTO path VALUES(null, '" + name + "', '" + path + "', '" + color + "')")
-        #self.conexion.commit()
+        errors = True
 
+        for path in paths:
+            #print(idPath.isnumeric())
+            if idPath.isnumeric():
+                if int(path[0]) == int(idPath):
+                    self.cursor.execute("DELETE FROM path WHERE id ='" + idPath + "';")
+                    self.conexion.commit()
+                    errors = False
+
+        if errors:
+            MessageBox.showerror("Error", "The identificator path does not exist or it's not a number")
+        
         self.conexion.close()
 
         self.window.destroy()
