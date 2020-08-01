@@ -9,16 +9,11 @@ from tkinter import filedialog
 
 class ShowPaths:
 
-    ############################
-
     def __init__(self):
         self.title = "Control Panel"
-        self.icon = "./Proyectito/imagenes/favicon.ico"
-        #self.icon_alt = "./18Tkinter/imagenes/favicon.ico"
+        self.icon = "./imagenes/logo.ico"
         self.size = "500x400"
         self.resizable = True
-        self.listNombres = ["XAMPP", "libro1", "libro2", "libro3",
-                            "libro4", "libro5", "libro6", "libro7", "libro8", "libro9"]
 
     def load(self):
         window = Tk()
@@ -27,18 +22,12 @@ class ShowPaths:
         window.title(self.title)
         ruta_icono = os.path.abspath(self.icon)
 
-        #if not os.path.isfile(ruta_icono):
-        #    ruta_icono = os.path.abspath(self.icon_alt)
-
         window.iconbitmap(ruta_icono)
-        #window.geometry(self.size)
 
         if self.resizable:
             window.resizable(1, 1)
         else:
             window.resizable(0, 0)
-            
-        ############################################################################
 
         container = Frame(self.window)
         container.config(
@@ -60,13 +49,10 @@ class ShowPaths:
         )
 
         canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        #Abrir conexión
-        self.conexion = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+'/panel.db')
 
-        #Crear cursor (permite ejecutar consultas)
+        self.conexion = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+'/panel.db')
         self.cursor = self.conexion.cursor()
 
         self.cursor.execute("SELECT * FROM path;")
@@ -81,12 +67,6 @@ class ShowPaths:
         container.pack()
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
-
-    ########################################################################################
-
-       
-
-    ###############################################
 
     def run(self):
         self.window.mainloop()

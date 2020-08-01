@@ -6,20 +6,14 @@ import math
 import sqlite3
 from insertPath import InsertForm
 from showPaths import ShowPaths
-from deletePath import DeletePath
 
-class Programa:
-
-    ############################
+class ControlRemote:
 
     def __init__(self):
-        self.title = "Control Panel"
-        self.icon = "./imagenes/favicon.ico"
-        self.icon_alt = "./Proyectito/imagenes/favicon.ico"
+        self.title = "Control remote"
+        self.icon = "./imagenes/logo.ico"
         self.size = "300x300"
         self.resizable = True
-        self.listNombres = ["XAMPP", "libro1", "libro2", "libro3",
-                            "libro4", "libro5", "libro6", "libro7", "libro8", "libro9"]
 
         self.conexion = sqlite3.connect(os.path.dirname(os.path.abspath(__file__))+'/panel.db')
         self.cursor = self.conexion.cursor()
@@ -40,8 +34,6 @@ class Programa:
 
         window.title(self.title)
         ruta_icono = os.path.abspath(self.icon)
-        #ruta_icono = os.path.relpath(self.icon)
-        #ruta_icono = self.icon
 
         window.iconbitmap(ruta_icono)
 
@@ -50,27 +42,17 @@ class Programa:
         else:
             window.resizable(0, 0)
 
-        #######################################################################################################################################
-
         mi_menu = Menu(self.window)
         self.window.config(menu=mi_menu)
 
-        # MENÚ DE LA APLICACIÓN
-        # El tearoff es para quitar las lineas separadoras del menu y solo dejar las que yo quiero
         archivo = Menu(mi_menu, tearoff=0)
-        archivo.add_command(label="New path", command=self.nuevaVentana)
-        archivo.add_command(label="Delete path", command=self.deletePath)
-        archivo.add_separator()
+        archivo.add_command(label="New path", command=self.createWindowFormPath)
         archivo.add_command(label="Show paths", command=self.showPaths)
-        archivo.add_command(label="Abrir carpeta")
         archivo.add_separator()
-        archivo.add_command(label="Salir", command=self.window.quit)
+        archivo.add_command(label="Exit", command=self.window.quit)
 
-        mi_menu.add_cascade(label="Archivo", menu=archivo)
-        mi_menu.add_command(label="Editar")
+        mi_menu.add_cascade(label="File", menu=archivo)
         mi_menu.add_command(label="Refresh", command=self.refresh)
-
-        ##########################################################################################################################################
 
         container = Frame(self.window)
         container.config(
@@ -115,11 +97,6 @@ class Programa:
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-    def deletePath(self):
-        newWindow = DeletePath()
-        newWindow.load()
-        newWindow.run()
-
     def showPaths(self):
         newWindow = ShowPaths()
         newWindow.load()
@@ -152,36 +129,60 @@ class Programa:
         )
         texto.pack(anchor=CENTER, fill=Y, expand=YES)
 
-        button = Button(marco, text="Abrir", command=lambda: self.abrir(ruta))
-        button.pack(anchor=CENTER)
+        button = Button(marco, text="Delete", command=lambda: self.deletePath(id))
+        button.pack(side=LEFT)
+        button = Button(marco, text="Abrir", command=lambda: self.openFile(ruta))
+        button.pack(side=RIGHT)
+    
+    def deletePath(self, idPath):
+
+        self.conexion = sqlite3.connect(os.path.dirname(
+            os.path.abspath(__file__))+'/panel.db')
+        self.cursor = self.conexion.cursor()
+
+        self.cursor.execute("SELECT * FROM path;")
+        paths = self.cursor.fetchall()
+
+        errors = True
+
+        for path in paths:
+            if int(path[0]) == int(idPath):
+                self.cursor.execute(
+                    "DELETE FROM path WHERE id ='" + str(idPath) + "';")
+                self.conexion.commit()
+                errors = False
+
+        if errors:
+            MessageBox.showerror(
+                "Error", "The identificator path does not exist or it's not a number")
+
+        self.conexion.close()
+
+        self.refresh()
 
     def refresh(self):
         self.window.destroy()
         
-        newWindow = Programa()
+        newWindow = ControlRemote()
         newWindow.load()
         newWindow.run()
 
-    def nuevaVentana(self):
-        #ventana = Tk()
+    def createWindowFormPath(self):
         insertForm = InsertForm()
         insertForm.load()
 
         insertForm.run()
-        #ventana.mainloop()
 
-    def abrir(self, ruta):
+    def openFile(self, ruta):
         if os.path.exists(ruta):
             wb.open_new(ruta)
         else:
             MessageBox.showerror("Error", "The path does not exist")
 
-    ###############################################
-
     def run(self):
         self.window.mainloop()
 
 
-programa = Programa()
-programa.load()
-programa.run()
+program = ControlRemote()
+program.load()
+program.run()

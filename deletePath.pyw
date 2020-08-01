@@ -8,16 +8,11 @@ from tkinter import filedialog
 
 class DeletePath:
 
-    ############################
-
     def __init__(self):
         self.title = "Control Panel"
-        self.icon = "./Proyectito/imagenes/favicon.ico"
-        #self.icon_alt = "./18Tkinter/imagenes/favicon.ico"
+        self.icon = "./imagenes/logo.ico"
         self.size = "500x400"
         self.resizable = True
-        self.listNombres = ["XAMPP", "libro1", "libro2", "libro3",
-                            "libro4", "libro5", "libro6", "libro7", "libro8", "libro9"]
 
     def load(self):
         window = Tk()
@@ -26,24 +21,16 @@ class DeletePath:
         window.title(self.title)
         ruta_icono = os.path.abspath(self.icon)
 
-        #if not os.path.isfile(ruta_icono):
-        #    ruta_icono = os.path.abspath(self.icon_alt)
-
         window.iconbitmap(ruta_icono)
-        #window.geometry(self.size)
 
         if self.resizable:
             window.resizable(1, 1)
         else:
             window.resizable(0, 0)
 
-        #################################
-
-        #Label
         label = Label(self.window, text="Identificator(ej: 1)")
         label.grid(row=1, column=0, sticky=W, padx=5, pady=5)
 
-        #Campo de texto
         entryDeletePath = Entry(self.window)
         entryDeletePath.grid(row=1, column=1, columnspan=6, sticky=W, padx=5, pady=5)
         entryDeletePath.config(justify="right", state="normal")
@@ -61,7 +48,6 @@ class DeletePath:
         errors = True
 
         for path in paths:
-            #print(idPath.isnumeric())
             if idPath.isnumeric():
                 if int(path[0]) == int(idPath):
                     self.cursor.execute("DELETE FROM path WHERE id ='" + idPath + "';")
@@ -85,8 +71,6 @@ class DeletePath:
         filename = filedialog.askopenfilename(
             initialdir="/", title="Select file")
         campo.insert(0, filename)
-
-    ###############################################
 
     def run(self):
         self.window.mainloop()
